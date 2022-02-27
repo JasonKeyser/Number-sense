@@ -3,7 +3,6 @@ import time
 import csv
 import os
 
-#the following code runs the leader board
 #this function takes results from player game, adds it to previous results and sorts it
 def leaderboard(n,csvpath):
     #checks if the file exists, if not, it creates one
@@ -19,13 +18,14 @@ def leaderboard(n,csvpath):
         players = [n[0]]
         #adds old player data to list with new player data lines
         for line in csv_reader:
-            line['time'] = float(line['time'])#data is stored as strings, this reverts it back to integers before adding to list
+            line['time'] = float(line['time']) #data is stored as strings, this reverts it back to integers before adding to list
             line['solved'] = int(line['solved'])
             line['htime'] = int(line['htime'])
             players.append(line)
-        #this sorts the data first by the amount of problems solved then by the amount of time taken
+    #this sorts the data first by the amount of problems solved then by the amount of time taken
     leeder = sorted(players, key=lambda x: (-x['solved'], x['time']))
     fastleeder = sorted(players, key = lambda x: x['htime'])
+
     #this writes the sorted data including the newest player's results back to the csv, ready to read for next time
     with open(csvpath, "w") as new_csv_writer:
         fnames = ['name', 'solved', 'time', 'htime']
@@ -40,209 +40,105 @@ def leaderboard(n,csvpath):
 
 print("Welcome to the Math Game")
 
+def format_question(top_number, bottom_number, answer, symbol):
+    '''
+    formats question vertically like
+    24
+   +10
+    34
+    '''
 
 
-#This asks the user to do addition with 2 single digit numbers
-def add1dig(k):
-    f = 2*(k+1)
-    v = int(random.randrange(1,5)*f)
-    j = int(random.randrange(1,5)*f)
-
-    # this if statement helps format the question in a vertical way instead of horizontal
-    dd = ''
-    if j < 10 and v < 10:
-        pp = ''
-    elif j < 10 and v >= 10 and v < 100:
-        pp = ' '
-    elif j < 10 and v >= 100:
-        pp = '  '
-    elif j >= 10 and j < 100 and v >= 10 and v < 100:
-        pp = ''
-    elif j >= 10 and j < 100 and v >= 100:
-        pp = ' '
-    elif j >= 10 and j < 100 and v < 10:
-        pp = ''
-        dd = ' '
-    elif j >= 100 and v < 10:
-        dd = '  '
-        pp = ''
-    elif j >= 100 and v >= 10 and v < 100:
-        dd = ' '
-        pp = ''
+    top_space = ''
+    if bottom_number < 10 and top_number < 10:
+        bottom_space = ''
+    elif bottom_number < 10 and top_number >= 10 and top_number < 100:
+        bottom_space = ' '
+    elif bottom_number < 10 and top_number >= 100:
+        bottom_space = '  '
+    elif bottom_number >= 10 and bottom_number < 100 and top_number >= 10 and top_number < 100:
+        bottom_space = ''
+    elif bottom_number >= 10 and bottom_number < 100 and top_number >= 100:
+        bottom_space = ' '
+    elif bottom_number >= 10 and bottom_number < 100 and top_number < 10:
+        bottom_space = ''
+        top_space = ' '
+    elif bottom_number >= 100 and top_number < 10:
+        top_space = '  '
+        bottom_space = ''
+    elif bottom_number >= 100 and top_number >= 10 and top_number < 100:
+        top_space = ' '
+        bottom_space = ''
     else:
-        pp = ''
-    #this formats the curser to start at the right length of digits for the answer
-    ansr = v + j
-    ansr1 = len(str(ansr))
-    if ansr1 == len(pp + str(j)) + 1:
-        ee = ''
-    elif ansr1 == len(pp + str(j)):
-        ee = ' '
-    elif ansr1 == len(pp + str(j)) - 1:
-        ee = '  '
+        bottom_space = ''
 
-    q = input("What is \n " + dd + str(v) + "\n+" + pp + str(j) +"?\n" + ee)
-    if int(q) == (v+j):
+    # following formats the curser to start at the right length of digits for the answer
+    ansr1 = len(str(answer))
+    bottom_row = len(bottom_space + str(bottom_number)) + 1
+    difference = bottom_row - ansr1
+    answer_space = ""
+    if difference > 0:
+        for _ in range(difference):
+            answer_space += " "
+
+    question = input(f"What is \n {top_space}{str(top_number)}\n{symbol}{bottom_space}{str(bottom_number)}?\n{answer_space}")
+    return question
+
+
+def compare_answer(q, answer, k):
+    if int(q) == answer:
         print("Good Job\n")
         return True, k + 1
     else:
         print("Wrong")
-        print("Right answer was "+ str(v+j))
+        print("Right answer was "+ str(answer))
         return False, k
+
+# bug, addition only has even numbers
+def addition(k):
+    f = (k+1)
+    top_number = int(random.randrange(1,5)*f)
+    bottom_number = int(random.randrange(1,5)*f)
+
+    answer = top_number + bottom_number
+    q = format_question(top_number, bottom_number, answer, "+")
+    return compare_answer(q,answer,k)
 
 #This asks user to do subtraction
 def sub(k):
     f = 4*(k+1)
-    v = int(random.random()*f + 2*(k+1))
-    j = int(random.random()*f)
-    #this if statement helps format the question in a vertical way instead of horizontal
-    gg = ''
-    if j < 10 and v < 10:
-        tt = ''
-    elif j < 10 and v >= 10 and v < 100:
-        tt = ' '
-    elif j < 10 and v >= 100:
-        tt = '  '
-    elif j >= 10 and j < 100 and v >= 10 and v < 100:
-        tt = ''
-    elif j >= 10 and j < 100 and v >= 100:
-        tt = ' '
-    elif j >= 10 and j < 100 and v < 10:
-        tt = ''
-        gg= ' '
-    elif j >= 100 and v < 10:
-        gg = '  '
-        tt = ''
-    elif j >= 100 and v >= 10 and v < 100:
-        gg = ' '
-        tt = ''
-    else:
-        tt = ''
+    top_number = int(random.random()*f + 2*(k+1))
+    bottom_number = int(random.random()*f)
 
-    #this formats the curser to start at the right length of digits for the answer
-    ansr = v - j
-    ansr1 = len(str(ansr))
-    if ansr1 == len(tt + str(j)) + 1:
-        ee = ''
-    elif ansr1 == len(tt + str(j)):
-        ee = ' '
-    elif ansr1 == len(tt + str(j)) - 1:
-        ee = '  '
-
-    q = input("What is \n " + gg + str(v) + "\n-" + tt + str(j) +"?\n" + ee)
-    if int(q) == (v-j):
-        print("Good Job\n")
-        return True, k + 1
-    else:
-        print("Wrong")
-        print("Right answer was " + str(v-j))
-        return False, k
+    answer = top_number - bottom_number
+    q = format_question(top_number,bottom_number,answer,'-')
+    return compare_answer(q,answer,k)
 
 
 #This asks the user to do multiplication with 2 single digit numbers
 def mult1dig(k):
     f = 2*(k+1)
     f1 = (k+1)
-    x = int(random.random()*f1)
-    b = int(random.random()*f)
-
-    #this if statement helps format the question in a vertical way instead of horizontal
-    nn = ''
-    if b < 10 and x < 10:
-        zz = ''
-    elif b < 10 and x >= 10 and x < 100:
-        zz = ' '
-    elif b < 10 and x >= 100:
-        zz = '  '
-    elif b >= 10 and b < 100 and x >= 10 and x < 100:
-        zz = ''
-    elif b >= 10 and b < 100 and x >= 100:
-        zz = ' '
-    elif b >= 10 and b < 100 and x < 10:
-        zz = ''
-        nn= ' '
-    elif b >= 100 and x< 10:
-        nn = '  '
-        zz = ''
-    elif b >= 100 and x >= 10 and x < 100:
-        nn = ' '
-        zz = ''
-    else:
-        zz = ''
-
-    #this formats the curser to start at the right length of digits for the answer
-    ansr = x*b
-    ansr1 = len(str(ansr))
-    if ansr1 == len(zz + str(b)) + 1:
-        ee = ''
-    elif ansr1 == len(zz + str(b)):
-        ee = ' '
-    elif ansr1 == len(zz + str(b)) - 1:
-        ee = '  '
-
-    q = input("What is \n " + nn + str(x) + "\nx" +  zz + str(b) +"?\n" + ee)
-    if int(q) == (x*b):
-        print("Good Job\n")
-        return True, k + 1
-    else:
-        print("Wrong")
-        print('Right answer was '+ str(x*b))
-        return False, k
+    top_number = int(random.random()*f1)
+    bottom_number = int(random.random()*f)
+    answer = top_number*bottom_number
+    q = format_question(top_number,bottom_number,answer,'x')
+    return compare_answer(q,answer,k)
 
 #'this asks player to do division'
 def div(k):
     f = .25*(k+1)
-    x = int(random.randrange(3,5)*f)
-    b = int(random.randrange(3,5)*f + 1)
-    d = x * b
+    answer = int(random.randrange(3,5)*f)
+    bottom_number= int(random.randrange(3,5)*f + 1)
+    top_number = answer * bottom_number
 
-    #this if statement helps format the question in a vertical way instead of horizontal
-    yy = ''
-    if b < 10 and d < 10:
-        cc = ''
-    elif b < 10 and d >= 10 and d < 100:
-        cc = ' '
-    elif b < 10 and d >= 100:
-        cc = '  '
-    elif b >= 10 and b < 100 and d >= 10 and d < 100:
-        cc = ''
-    elif b >= 10 and b < 100 and d >= 100:
-        cc = ' '
-    elif b >= 10 and b < 100 and d < 10:
-        cc = ''
-        yy= ' '
-    elif b >= 100 and d< 10:
-        yy = '  '
-        cc = ''
-    elif b >= 100 and d >= 10 and d < 100:
-        yy = ' '
-        cc = ''
-    else:
-        cc = ''
-
-    #this formats the curser to start at the right length of digits for the answer
-    ansr = x
-    ansr1 = len(str(ansr))
-    if ansr1 == len(cc + str(b)) + 1:
-        ee = ''
-    elif ansr1 == len(cc + str(b)):
-        ee = ' '
-    elif ansr1 == len(cc + str(b)) - 1:
-        ee = '  '
-
-    q = input("What is \n " + yy + str(d) + "\n/" + cc + str(b) +"?\n" + ee)
-    if int(q) == (x):
-        print("Good Job\n")
-        return True, k + 1
-    else:
-        print("Wrong")
-        print('Right answer was '+ str(x))
-        return False, k
+    q = format_question(top_number,bottom_number,answer,'/')
+    return compare_answer(q,answer,k)
 
 #this does exponents
 def exp(k):
     f = .2*(k+1)
-    x = int(random.random()*f)
+    x = int(random.random()*f +1)
     b = int(random.randrange(2,4))
     q = input("What is \n" + str(x) + "^" + str(b) +"?\n ")
     if int(q) == (x ** b):
@@ -253,12 +149,12 @@ def exp(k):
         print('Right answer was '+ str(x ** b))
         return False, k
 
-#this does square root problems
+# this does square root problems
 def sqr(k):
     f = .1*(k+1)
     x = int(random.randrange(1,5)*f)
     d = x * x
-    q = input("What is the sq root of " + str(d) +"?     ")
+    q = input("What is the sq root of " + str(d) +"?\n ")
     if int(q) == (x):
         print("Good Job\n")
         return True, k + 1
@@ -267,14 +163,41 @@ def sqr(k):
         print('Right answer was '+ str(x))
         return False, k
 
+
+classic_funcs = [mult1dig,sub,addition,div]
+classic_funcs_2 = [mult1dig,sub,addition,div,exp,sqr]
+multiplication_funcs = [mult1dig]
+division_funcs = [div]
+subtraction_funcs = [sub]
+addition_funcs = [addition]
+
+classic_leaderboard = r'C:\Users\Jason Keyser\Documents\mathgamethirdleaderboard.csv'
+mult_leaderboard = r'C:\Users\Jason Keyser\Documents\mathgamethirdleaderboardmultiplication.csv'
+div_leaderboard = r'C:\Users\Jason Keyser\Documents\mathgamethirdleaderboarddivision.csv'
+add_leaderboard = r'C:\Users\Jason Keyser\Documents\mathgamethirdleaderboardaddition.csv'
+sub_leaderboard = r'C:\Users\Jason Keyser\Documents\mathgamethirdleaderboardsubtraction.csv'
+
 cc = 1
 while cc == 1:
-    nm = input("\nWhat is your name?    ")
+    game_type = input("\nWhat game mode? "
+                      "\n Type 'c' for classic mode or 'multiplicaton' 'division' 'addition'  or 'subtraction' to practice specific operations. ")
+
+    game_modes = {'m': [multiplication_funcs, multiplication_funcs, mult_leaderboard],
+                  'd': [division_funcs,division_funcs,div_leaderboard],
+                  's': [subtraction_funcs,subtraction_funcs, sub_leaderboard],
+                  'a': [addition_funcs, addition_funcs, add_leaderboard],
+                  'c':[classic_funcs, classic_funcs_2,classic_leaderboard]}
+
+    choice = game_type[0].lower()
+    funklist = game_modes[choice][0]
+    funk2list = game_modes[choice][1]
+    leaderboard_path = game_modes[choice][2]
+
+
+    nm = input("\nType your name and press Enter    ")
     print("\nClock is running, calculate!\n")
     x = time.time()
     x2 = None
-    funklist = [mult1dig,sub,add1dig,div]
-    funk2list = [mult1dig,sub,add1dig,div,exp,sqr]
     i = True
     c = 0
     while i == True:
@@ -297,7 +220,7 @@ while cc == 1:
         hrd = 1000
 
     new_player = [{'name': nm, 'solved': c, 'time':z, 'htime':hrd}]
-    d, y = leaderboard(new_player,r'C:\Users\Jason Keyser\Documents\mathgamethirdleaderboard.csv')
+    d, y = leaderboard(new_player,leaderboard_path)
 #this loops through the list of dicts and prints out the top ten scores
     print('Leaderboard\n Name Score Seconds')
     i2 = 1
